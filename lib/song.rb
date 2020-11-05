@@ -2,75 +2,77 @@ require 'pry'
 class Song
   attr_accessor :name, :artist_name
   @@all = []
-
-  def self.create
-    song = Song.new 
-    @@all << song
-    song
-
-  end
-  def self.new_by_name(new_song)
-    song = Song.create
-    @name = new_song
-    song.name = @name 
-    song
-
-
-    
- end
-
-def self.create_by_name(name)
-  song = Song.new_by_name(name)
-   Song.all.find do |create| 
-    create.name == name
-end 
  
-  end
-
-  def self.find_by_name(name)
-    Song.all.find do |create| 
-      create.name == name
-  end 
-end
-
   def self.all
     @@all
   end
-  
+ 
   def save
     self.class.all << self
   end
 
-  def self.find_or_create_by_name(title)
-    if  find_by_name(title)
-      find_by_name(title)
-   else 
-     create_by_name(title)
-    end
+  def self.create 
+     
+    song = Song.new
+    self.all << song
+    song
+
+  end 
+
+  def self.new_by_name(name)
+    song = self.new
+    song.name = name 
+    song.save
+    song
+  end 
+
+  def self.create_by_name(name)
+     song = self.create
+     song.name = name 
+     return song
+  end 
+
+  def self.find_by_name(name)
+    
+   return self.all.find{ |song| song.name == name}
+ 
   end
 
-  def self.alphabetical
-    Song.all.sort_by { |song| song.name } 
-    
-  end
+  def self.find_or_create_by_name(name)
+   
+    self.find_by_name(name) ||  self.create_by_name(name)
   
-  def self.destroy_all
-    Song.all.clear
-  end
+  end 
 
-  def self.new_from_filename(string)
+  def self.alphabetical 
     
-   new_string = string.split(".mp3").join(" ").split(" - ")
-   instance = Song.create
-   instance.name = new_string[1]
-   instance.artist_name = new_string[0]
+    self.all.sort_by{ |song| song.name }
+  end 
 
-   instance
-  end
+  def self.destroy_all
+   self.all.clear 
+  end 
 
-  def self.create_from_filename(song)
-    new_parse = Song.new_from_filename(song)
-    @@all << new_parse
-  end
-  binding.pry
+ def self.new_from_filename(filename)
+     parts = filename.split(" - ")
+     artist_name = parts[0]
+     name = parts[1].gsub(".mp3","")
+
+     song = self.new 
+     song.name = name 
+     song.artist_name = artist_name
+     song
+end 
+
+def self.create_from_filename(filename)
+  parts = filename.split(" - ")
+  artist_name = parts[0]
+  name = parts[1].gsub(".mp3","")
+
+  song = self.create
+  song.name = name 
+  song.artist_name = artist_name
+  song
+end  
+    
 end
